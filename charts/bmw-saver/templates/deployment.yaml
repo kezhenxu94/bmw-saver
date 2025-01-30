@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bmw-saver
+  labels:
+    {{- include "bmw-saver.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "bmw-saver.selectorLabels" . | nindent 8 }}
+  template:
+    metadata:
+      labels:
+        {{- include "bmw-saver.selectorLabels" . | nindent 10 }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      priorityClassName: {{ include "bmw-saver.fullname" . }}-priority
+      containers:
+      - name: bmw-saver
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+        - "--config"
+        - "/etc/bmw-saver/config.yaml"
+        - "--log-level"
+        - "debug"
+        env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          {{- with .Values.env }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+
+        volumeMounts:
+        - name: config
+          mountPath: /etc/bmw-saver/config.yaml
+          subPath: config.yaml
+        {{- if or .Values.googleCalendar.enabled .Values.googleCalendar.existingSecret }}
+        - name: google-creds
+          mountPath: /etc/google
+          readOnly: true
+        {{- end }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      - name: config
+        configMap:
+          name: bmw-saver-config
+      {{- if or .Values.googleCalendar.enabled .Values.googleCalendar.existingSecret }}
+      - name: google-creds
+        secret:
+          secretName: {{ default (printf "%s-gcal" (include "bmw-saver.fullname" .)) .Values.googleCalendar.existingSecret }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }} 

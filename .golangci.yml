@@ -1,0 +1,36 @@
+linters:
+  enable:
+    - gofmt
+    - govet
+    - goimports
+    - gosimple
+    - staticcheck
+    - errcheck
+    - ineffassign
+    - typecheck
+    - misspell
+    - gosec
+    - revive
+
+linters-settings:
+  govet:
+    enable:
+      - shadow
+  goimports:
+    local-prefixes: github.com/kezhenxu94/bmw-saver
+  revive:
+    rules:
+      - name: exported
+        arguments:
+          - "checkPrivateReceivers"
+          - "disableStutteringCheck"
+
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0 

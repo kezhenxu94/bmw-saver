@@ -1,0 +1,9 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: {{ include "bmw-saver.fullname" . }}-priority
+  labels:
+    {{- include "bmw-saver.labels" . | nindent 4 }}
+value: 1000000
+globalDefault: false
+description: "Priority class for BMW-Saver to ensure it can be scheduled during node scale-down" 

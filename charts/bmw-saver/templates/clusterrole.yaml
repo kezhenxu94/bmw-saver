@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bmw-saver
+  labels:
+    {{- include "bmw-saver.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch", "delete", "patch"]
+- apiGroups: ["container.googleapis.com"]
+  resources: ["clusters", "nodepools"]
+  verbs: ["get", "list", "update", "patch"] 
+- apiGroups: ["eks.amazonaws.com"]
+  resources: ["nodegroups"]
+  verbs: ["get", "list", "update", "patch"] 

@@ -1,0 +1,80 @@
+# Override the chart name
+nameOverride: ""
+# Override the full name
+fullnameOverride: ""
+
+image:
+  repository: bmw-saver
+  tag: latest
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: "bmw-saver"
+  annotations: {}
+
+config:
+  # nodeSpecs:
+  #   - nodePoolName: "node-pool-name"
+  #     cloudProvider: "gke"
+  #     offTimeCount: 1
+  schedule:
+    startTime: "09:00"        # Start time of work hours in a working day
+    endTime: "17:00"          # End time of work hours in a working day
+    timeZone: "Asia/Shanghai" # Time zone of the schedule
+    workDays:                 # Work days in a week
+      monday: true
+      tuesday: true
+      wednesday: true
+      thursday: true
+      friday: true
+      saturday: false
+      sunday: false
+
+    # Optional Google Calendar integration
+    # googleCalendar:
+    #   calendarId: "your-calendar-id"
+    #   credentialsPath: "/etc/google/credentials.json"  # Path in the container
+    #   offTimeEvents: "<my name> Public Holiday"        # Search query for off-time events
+    #   syncInterval: "1h"
+    #   cacheDays: 7
+
+    # Optional ICS Calendar integration
+    # icsCalendar:
+    #   url: "https://calendars.icloud.com/holidays/cn_zh.ics"  # ICS calendar URL
+    #   workDayPatterns:                                        # Patterns to match work day events, any pattern that matches will be considered work time
+    #     - ".*（班）"                                           # Chinese work day pattern
+    #     - "Workday"                                           # English work day pattern
+    #   holidayPatterns:                                        # Patterns to match holiday events, any pattern that matches will be considered holiday
+    #     - ".*（休）"                                           # Chinese holiday pattern
+    #     - "Holiday"                                           # English holiday pattern
+    #   syncInterval: "1h"                                      # How often to sync calendar
+
+# Google Calendar credentials secret
+googleCalendar:
+  # Set to true to create a secret for Google Calendar credentials
+  enabled: false
+  # Base64 encoded credentials.json content
+  # You can encode your file using: base64 -w 0 credentials.json
+  credentials: ""
+  # Or specify an existing secret name
+  existingSecret: ""
+  # Key in the secret that contains the credentials
+  credentialsKey: "credentials.json"
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {} 
+
+env: {}
+  # Required for AWS
+  # - name: EKS_CLUSTER_NAME
+  #   value: "the-cluster-name"
